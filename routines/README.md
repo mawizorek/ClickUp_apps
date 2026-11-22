@@ -40,15 +40,16 @@ Before adding ANY instruction to an executor agent, route the detail to its corr
 - **Stamps live in `routines/last-run/<routine>.txt`** (the STATE) — one file per routine, one writer per file, never a shared log.
 - **Run reports land on the standing thread** (the RECORD); **their template lives in the repo** (the PROCEDURE).
 - ⚠️ **Runbook FRONTMATTER is metadata, never a switch.** **The row in `schedule.md` is the only ON/OFF switch and the only cadence** (LOCKED 2026-07-30). If frontmatter and the schedule table disagree, the table wins and the frontmatter is rot.
-- ⚠️ **A runbook may be SPLIT across files, but only by concern, and only one claimant per fact (2026-08-04).** When a runbook outgrows what can comfortably be read whole, split it — procedure/guardrails in the runbook, output shape in a `-templates.md`, source list and domain intelligence in a `-sources.md`. The runbook names its siblings at the top and **never restates their content.** Reference case: `job-market-refresh.md` v17.
+- ⚠️ **A runbook may be SPLIT across files, but only by concern, and only one claimant per fact (2026-08-04).** When a runbook outgrows what can comfortably be read whole, split it — procedure/guardrails in the runbook, output shape in a `-templates.md`, source list and domain intelligence in a `-sources.md`. The runbook names its siblings at the top and **never restates their content.** Reference case: `job-market-refresh.md` v17. *(v21, 2026-11-22: Job Market's source list and lane config moved out of the repo entirely, into ClickUp record lists; its runbook now has one sibling, `-templates.md`.)*
 - **APPROVED DATA SURFACES ONLY.** A routine may only write *data*, never app source, engine, or structure. Approved write surfaces:
   - **(a) Repo data files** (a `data.json`, a state `.tsv`, or a DIRECTORY of them) — the primary store.
   - **(b) Designated ClickUp task fields** — only when a runbook names the list and whitelisted fields, and only on *existing* tasks.
   - **(c) A named ClickUp COMMENT THREAD** the runbook designates as its read surface.
   - **(d) The routine's own `last-run` stamp file.**
   - **(e) A run-report comment on the standing thread.**
+  - **(f) A designated ClickUp RECORD LIST** that IS the routine's database (added 2026-11-22, Michael; Decision Log J9/J10). The runbook names the list, the schema and a stable dedupe key; the routine may create record tasks there and nowhere else, never with native due dates or assignees. **Only instance: Job Market → Job Census** (dedupe key `Posting URL`). Adding a second instance is a build-session decision.
   If a routine seems to need an engine/source/structure change, that's a build session — STOP and flag.
-- **ClickUp object writes are field-scoped and non-structural.** Never create, delete, move, reparent, or restructure tasks or lists. The data → task mapping MUST be an explicit key in the data, never fuzzy name-matching.
+- **ClickUp object writes are field-scoped and non-structural.** Never create, delete, move, reparent, or restructure tasks or lists, **except record creation in a surface-(f) list.** The data → task mapping MUST be an explicit key in the data, never fuzzy name-matching.
 - **Fail loud, never guess.**
 
 ---
@@ -122,7 +123,7 @@ A "refresh" is a **verify-and-merge**, never a blank-slate rebuild:
  - **Stop at a BOUNDARY, never inside one.**
  - **The stamp is the seam.** run → land the product → stamp → report → next routine.
  - **Length is not a reason to hurry.** A long procedure is long on purpose.
-14. **COMMIT AT THE BOUNDARY — never hand state to another session as text** *(LOCKED 2026-08-04, Michael).* Rule 13 says stop at a boundary; this says what must be TRUE at every boundary. **The committed file is the only handoff.**
+14. **COMMIT AT THE BOUNDARY — never hand state to another session as text** *(LOCKED 2026-08-04, Michael).* Rule 13 says stop at a boundary; this says what must be TRUE at every boundary. **The committed file is the only handoff.** *(For a surface-(f) routine, "committed" means the record tasks are written; the same rule applies.)*
  - **Michael:** *"Each session should complete its loop fully and not try to pass TSV data between sessions for exactly the reasons you found."*
  - **A routine with internal boundaries commits at every one of them**, not once at the end. The window in which real work exists only in a session's head is one unit long, never a whole pass.
  - 🚫 **A checkpoint, handoff or status comment carries POSITION, never DATA.** **If you are tempted to paste a data row into a comment so the next session can apply it, commit it instead.**
@@ -177,7 +178,8 @@ N.   Report
 - **Data-only refresh** → commit to `main` without further confirmation. **This includes many commits in one pass** — per-boundary commits under rule 14 are the same tier, and each one is not a fresh gate.
 - **ClickUp task-field refresh** (whitelisted fields, keyed mapping) → same tier.
 - **ClickUp comment writes to a runbook-named thread** → same tier.
-- **Anything touching engine/source, or creating/deleting/moving/reparenting tasks or lists** → NOT a routine. Route to a build session.
+- **Record creation in a surface-(f) list** (keyed by its dedupe field) → same tier.
+- **Anything touching engine/source, or creating/deleting/moving/reparenting tasks or lists** (outside surface (f)) → NOT a routine. Route to a build session.
 
 **Do not re-gate an approved run.** Asking again inside a run the human just authorized trains people to click through.
 
@@ -200,10 +202,10 @@ Zero agent changes. **If adding a routine requires editing the executor, the fra
 |---------|--------|---------------------------|--------|
 | `on-track-refresh.md` | `on-track/data.json` | every Wednesday | active · 🔻 rule 14/15 audit owed |
 | `f1-refresh.md` | `f1-racetracks/f1-results/2026/` + ClickUp "Race History" field (slim mirror) | Thu–Sun, session-aware | active · 🔻 rule 14/15 audit owed |
-| `job-market-refresh.md` (+ `-templates.md`, `-sources.md`) | `routines/job-market-state/<role_id>.tsv` (one file per lane, committed per role) + its own ClickUp standing thread (`86ajtgbt3`) | daily | active |
+| `job-market-refresh.md` (+ `-templates.md`) | ClickUp **Job Census** list (surface f, one task per posting per board) + Lanes `Last Pass` + Job Sources sweep fields + its own ClickUp standing thread (`86ajtgbt3`) | daily | active · v21 |
 | `world-cup-refresh.md` | `world-cup-bracket/data.json` + ClickUp "World Cup" list (mirror) | — | 🏁 **RETIRED 2026-07-26** (app stays live) |
 
-> 🪦 `routines/job-market-state.tsv` (single combined file) is a **tombstone stub** as of 2026-08-04 — state split per lane. Do not read or write it. See `routines/job-market-state/_MIGRATION.md`.
+> 🪦 Job Market's repo state is **retired as of 2026-11-22 (v20/v21)**: `routines/job-market-state/*.tsv` is FROZEN read-only history (migrate-on-first-touch, see `_FROZEN.md`), and `job-market-state.tsv`, `_MIGRATION.md`, `_unfiled.tsv`, `job-market-roles.json`, `job-market-sources*.md`, `job-market-refresh.notes.md` and `job-market-schema.md` are tombstones. Do not read or write them.
 
 ## Executor
 
