@@ -12,13 +12,13 @@ Seams: Ricky runs sweep and state; Sage researches outside facts; Paige holds pa
 
 ## Feedback loop
 
-After each debrief inspect `routines/job-market-state/_unfiled.tsv`, `also_lanes`, and `requirements`. Propose role/keyword/exclude/config changes; do not edit directly. Three similar unfiled finds support a new role proposal. Repeated cross-lane titles are a config issue, raised once and ruled.
+After each debrief inspect the pass's NOTABLE lane-misfits, the `Lane` relationships on [Job Census](https://app.clickup.com/36074068/v/li/1400600000006272) rows (multi-lane rows), and their captured requirements. Propose keyword/exclude/contract changes against the matching [Lanes](https://app.clickup.com/36074068/v/li/1400600000006271) task, or board changes against [Job Sources](https://app.clickup.com/36074068/v/li/901328152493); do not edit directly. Three similar lane-misfits support a new lane proposal. Repeated cross-lane titles are a config issue, raised once and ruled in the Job Market Decision Log.
 
 ## Portrait baseline
 
 Current role: Production Manager, URITP. Preference: non-academic live entertainment. Geography: anywhere; West Coast live. Search lanes: PM primary; DoP aspirational; TD, ME, Audio/Sound, Drafting/Design Support, Ops/Safety, Arts Admin/Creative Adjacent, Producing/Artistic remain coverage lanes; SM side work. Drafting is side-income unless new evidence reopens it. Audio stays. Niche is a feature, not a filter.
 
-Credentials and education: OSHA safety courses; no ETCP, OSHA 30, formal crowd-management certification, AutoCAD, or Revit; Vectorworks Spotlight/3D/Braceworks, ETC Eos, Lightwright 6, KiCad, Logic Pro, Mainstage, C/C++, 3D print; BS Audio and Music Engineering and BA English: Theatre, University of Rochester. Credential truth: JSON and Paige disagree; cite JSON for search and do not infer absence from either alone.
+Credentials and education: OSHA safety courses; no ETCP, OSHA 30, formal crowd-management certification, AutoCAD, or Revit; Vectorworks Spotlight/3D/Braceworks, ETC Eos, Lightwright 6, KiCad, Logic Pro, Mainstage, C/C++, 3D print; BS Audio and Music Engineering and BA English: Theatre, University of Rochester. Credential truth: the runbook's Global constraints (ported from the retired roles.json) and Paige disagree; cite the runbook for search and do not infer absence from either alone.
 
 Compensation tension: earned floor is $70K with lower exceptional work possible; declared evaluation uses $90K soft floor and $100-150K target. Never silently choose. Salary filters noise, not opportunity. Near-home work has no comp floor.
 
@@ -36,7 +36,7 @@ Compensation tension: earned floor is $70K with lower exceptional work possible;
 
 ## Pointers
 
-Evaluation: `routines/job-market-evaluation.md`. Ricky thread `86ajtgbt3`. State: `routines/job-market-state/<role_id>.tsv`. Roles: `routines/job-market-roles.json`. Runbook: `routines/job-market-refresh.md`, `-templates.md`, `-sources.md`. Hook: `hooks/job-routine-response.md`. Funnel: Applications list `900600097138`.
+Evaluation: `routines/job-market-evaluation.md`. Ricky thread `86ajtgbt3`. Inventory: [Job Census](https://app.clickup.com/36074068/v/li/1400600000006272). Lane contracts: [Lanes](https://app.clickup.com/36074068/v/li/1400600000006271). Boards: [Job Sources](https://app.clickup.com/36074068/v/li/901328152493). Decisions: Job Market Decision Log (https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-81593). Runbook: `routines/job-market-refresh.md`, `-templates.md`. Hook: `hooks/job-routine-response.md`. Funnel: Applications list `900600097138`. Tombstones, never read as state: `job-market-roles.json`, `job-market-state*.tsv`, `job-market-sources*.md`.
 
 ## Voice and announce
 

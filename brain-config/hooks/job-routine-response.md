@@ -5,7 +5,7 @@ type: hook
 steward: compass-corso
 trigger: after Ricky's job-market-refresh pass completes, OR on manual invocation
 added: 2026-08-02
-version: 2
+version: 3
 ---
 
 # Job Routine Response
@@ -23,6 +23,11 @@ version: 2
 Evaluates the MOST RECENT job-market-refresh pass through the lens of Corso's career portrait
 and delivers an opinionated executive debrief. This is the procedure Corso runs; it is a TOOL,
 not stored in his profile (Constitution §2-§3).
+
+> 🗄️ **v3 (2026-11-22): the inventory lives in ClickUp.** Listings = [Job Census](https://app.clickup.com/36074068/v/li/1400600000006272)
+> tasks. Lane contracts (keywords, levels, excludes) = [Lanes](https://app.clickup.com/36074068/v/li/1400600000006271) tasks. Boards =
+> [Job Sources](https://app.clickup.com/36074068/v/li/901328152493) tasks. `job-market-roles.json`, `job-market-state.tsv` and the lane
+> TSVs are tombstones: never read them as current state, never propose edits to them.
 
 ---
 
@@ -47,7 +52,9 @@ and anything that's "conversation not procedure" goes to the **conversational su
 - Open the standing job market task (`86ajtgbt3`)
 - Find the MOST RECENT pass summary comment (`📋 PASS COMPLETE`)
 - Read the pass summary + the role header comments + their threaded replies
-- If no pass exists yet: say so and offer to review the TSV inventory cold instead
+- Follow each NEW reply's link to its Job Census task for requirements, salary, accessibility and
+  `Last Verified`
+- If no pass exists yet: say so and offer to review the Job Census `live` rows cold instead
 
 ### 2. Load the evaluation baseline, then the portrait
 
@@ -106,7 +113,7 @@ Structure:
 <one observation about what this pass reveals: market shifts, recurring orgs, salary trends>
 
 ### 🔧 Routine feedback
-<proposed adjustments to job-market-roles.json or the runbook for better future passes>
+<proposed adjustments to a Lanes task contract, a Job Sources task, or a runbook section>
 ```
 
 ### 5. Update the portrait
@@ -118,10 +125,13 @@ Structure:
 ### 6. Propose routine edits (when warranted)
 
 - If the sweep missed something the portrait says it should find: propose a keyword addition
-  to `routines/job-market-roles.json`
-- If the sweep surfaced persistent noise: propose an exclude_term
-- If a new role category is emerging from the arc: propose a new role entry
-- Format: clear diff-style proposal, not a direct write. Michael or Ricky approves.
+  to that lane's **Lanes task** contract
+- If the sweep surfaced persistent noise: propose an exclude term on the Lanes task
+- If a board keeps yielding or keeps failing: propose a change to its **Job Sources** task
+- If a new role category is emerging from the arc: propose a new lane (Michael approves; it becomes
+  a new Lanes task plus a line in the runbook's fixed lane order)
+- Format: clear diff-style proposal, not a direct write. Michael or Ricky approves. Rulings land in
+  the Job Market Decision Log (https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-81593).
 - **If the debrief surfaces a shift in DECLARED preferences** (not just observed patterns):
   propose an amendment to `routines/job-market-evaluation.md`. Same approval gate: Michael
   confirms before the file changes.
@@ -134,8 +144,9 @@ Structure:
 |------|------|-----------|
 | `routines/job-market-evaluation.md` | Stated baseline: declared preferences, career thesis, soft filters | Step 2 (first) |
 | `super-agents/compass-corso/memory.md` | Earned overlay: observed patterns, revealed preference | Step 2 (second) |
-| `routines/job-market-state.tsv` | Structured inventory (read-only for Corso) | Step 1 (if needed) |
-| `routines/job-market-roles.json` | Search config (what Ricky uses) | Step 6 (for proposed edits) |
+| [Job Census](https://app.clickup.com/36074068/v/li/1400600000006272) | Structured inventory (read-only for Corso) | Step 1 |
+| [Lanes](https://app.clickup.com/36074068/v/li/1400600000006271) | Lane contracts: what Ricky searches for | Step 6 (for proposed edits) |
+| [Job Sources](https://app.clickup.com/36074068/v/li/901328152493) | Board records | Step 6 (for proposed edits) |
 | Standing task `86ajtgbt3` | The sweep output and ops discussion thread | Step 1 |
 | [Conversational subtask](https://app.clickup.com/t/86ajut2wq) | Exploratory career dialogue surface (not read during debrief, but where follow-ups land) | Post-debrief |
 
@@ -159,7 +170,9 @@ When the portrait is thin or empty:
 
 ## Guardrails
 
-- **Never modify the TSV or commit to the routine config directly.** Propose only.
+- **Never modify Job Census, Lanes or Job Sources records, or commit to the routine config
+  directly.** Propose only.
+- **Never read a tombstoned file (`job-market-roles.json`, `job-market-state*.tsv`) as current state.**
 - **Never assert a career fact not yet earned through interaction.** "I think" beats "you should"
   until the portrait has depth.
 - **Never create a task on the Applications list.** Michael decides when to act.
