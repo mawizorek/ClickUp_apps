@@ -24,7 +24,7 @@ Shape governed by `_shared/designer-base.md` §2. Five entry kinds and nothing e
 
 ## 3 · Collisions
 
-**EMPTY.** Genuinely empty at birth, 2026-11-17.
+- **SMITH · SFANW · 2026-11-21 · PLANNED, pre-plot.** INTENT: an even back light across every zone, for 12 designers. REALITY: the venue's hang positions don't allow it. Putting the B/L PARs side by side gives different angles from zone to zone. WHAT MOVED: the design. Michael, verbatim: "I don't really have the position to put them where I want... I also have all the moving lights that I'm planning to use as the primary backlight systems." The movers (8 Lonestar, 6 Aura) are the primary back light and the 9 B/L PARs are secondary. TAUGHT: in this room, back light is bounded by positions, not by fixture count. ⚠️ Knock-on, not yet tested: a mover serving as back light is not free for a designer's special in the same moment. Revisit in tech.
 
 🎯 The other entry kind the retirement condition is keyed on.
 
