@@ -14,6 +14,9 @@ Lighting previz tools, current state and statuses: `blender/previz/README.md` an
 - **EARNED 2026-11-21.** Split pure logic from `bpy` and test it with fakes against the user's real input file. Fast, honest, and it caught a real data defect before Blender ran.
 - **EARNED 2026-11-21.** Framing shutters in Cycles: a mask in the spot light's node tree (the same place BlenderDMX puts gobos and iris), driven from object properties so it works without the add-on loaded. EEVEE ignores light node trees.
 - **EARNED 2026-11-21.** Previz cameras: level (no tilt), height framed with Shift Y so verticals stay square, long clip end, tagged as placed so reruns never move them.
+- **EARNED 2026-11-21 (musician set).** A mesh update swaps mesh DATA in place by stable object name, keeping objects, collections and origins, so every show file that links the library picks the change up on reload. Never re-import beside the old copy.
+- **EARNED 2026-11-21.** Build the mesh inside Blender from the repo's JSON contract (`ZED_performer_from_repo.py`) instead of shipping binaries. Real quads + n-gon caps, smooth with sharp-by-angle, and geometry verified identical to the Python source before shipping.
+- **EARNED 2026-11-20.** Blocking: animate a mover empty, never the mesh. The stand-in (box, linked performer, later the rig) rides on it, so swapping what rides keeps every key.
 
 ## Ledger B — Failure modes + the tell
 
@@ -28,6 +31,8 @@ Lighting previz tools, current state and statuses: `blender/previz/README.md` an
 - **EARNED 2026-11-21.** Vectorworks default lighting symbols only fetch a GDTF when they carry a Type ID, so the MVR ships without GDTFs. The tell: empty GDTF fields in Object Info.
 - **EARNED 2026-11-21.** A Vectorworks MVR export that includes scene geometry balloons to hundreds of MB. Export fixtures only; geometry travels as FBX.
 - **EARNED 2026-11-21.** A swapped pair in a mirrored control (Right/Left shutters) reads as correct in a symmetric test. Test asymmetric cases and assert direction, not just amount.
+- **EARNED 2026-11-20.** Script prints reach only the system console, which Michael never sees. The tell: "no red, file saved" but the height check is invisible. Every script ends with an on-screen pop-up report.
+- **EARNED 2026-11-21.** The connected GitHub access writes text only, so a binary (GLB, ZIP, .blend) cannot be committed. The tell: "store it in the repo" with a binary in hand. Commit the source + contracts and build inside Blender from them; binaries stay as ClickUp copies.
 
 ## Ledger C — Standards that keep mattering
 
@@ -36,6 +41,7 @@ Lighting previz tools, current state and statuses: `blender/previz/README.md` an
 - **EARNED 2026-11-21.** Vectorworks owns fixtures (type, position, patch); the previz file owns cameras, world, render and animation. Never edit a fixture in Blender; the next sync puts it back.
 - **EARNED 2026-11-21.** Fixtures travel by MVR, geometry by FBX, never mixed in one file.
 - **EARNED 2026-11-21.** A camera lives in the file that owns its position.
+- **EARNED 2026-11-21.** A library file's NAME never carries a version (show files link by path). Versions live in the repo CHANGELOG. Libraries live on local disk under the ruled MAW_PREVIS/_LIBRARY layout, never in a sync folder.
 - Cited sources live with the method hook, not here.
 
 ## Ledger D — Arguments already lost
@@ -47,13 +53,14 @@ Lighting previz tools, current state and statuses: `blender/previz/README.md` an
 
 - **ONE performer model, repeated for a room of instruments.** His words, 2026-11-19: *"realistically, its ONE model, repeated for a ROOM of instruments."* Playing posture is a saved pose or action on the one rig, never a second rig. Any proposal that forks the rig per instrument is already refused.
 - **Keys-first demo design is refused.** Build the reusable rig from the start; the first shot does not get to define the system.
-- **The faceted, grey, low-poly sculptural read stays.** *"I like these as a starting point."* Do not smooth it into a realistic mannequin. Builds should be quick and carry good style points.
+- **Sculptural, stylized, never a realistic mannequin.** Style E "Brancusi" (one turned ovoid per bone), judged by the "scarecrow / tin man" read. ~~The faceted low-poly read stays~~ superseded 2026-11-21: Michael asked for smooth surfaces with fewer visible vertex lines ("not necessarily spherical"). Smooth shading yes, realism no. Builds stay quick and carry style points.
 - **EARNED 2026-11-21. Real lighting words only.** *"Shaper isn't a lighting term."* Tool and control names are what he'd say on a headset.
 - **EARNED 2026-11-21. In-house first.** Tools get played across a dozen of his own shows before anything goes upstream: *"impress me first."*
 - **EARNED 2026-11-21. Zed leads.** *"You're still floating us through this a little bit instead of leading this project."* Decide the mechanic, build it, report it.
+- **EARNED 2026-11-21. The repo is the store.** *"store this ... as a real current state in the repo ... not here in loose chat session."* Chat attachments are copies; the repo folder is the truth.
 
 ## Measured Blender facts
 
-- **Blender 5.2.2 LTS is confirmed for this seat** (Michael's Shutters self-test console, 2026-11-21).
+- **Blender 5.2.2 LTS is confirmed for this seat** (Michael's Shutters self-test console, 2026-11-21; also his library-build screenshot title bar, 2026-11-20).
 - BlenderDMX extension "DMX" from extensions.blender.org, as installed on his machine 2026-11-21 (version on the README). Listed permission: Files only. Whether it receives sACN under that permission is unmeasured.
 - 🔴 One shared facts ledger between the two Blender seats is still an open question (`decision-log.md` D8).

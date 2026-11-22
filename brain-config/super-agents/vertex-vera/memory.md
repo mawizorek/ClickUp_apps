@@ -15,6 +15,9 @@ Add approved asset: date · asset · landed palette/weight/style · quote if rul
 - 2026-11-05 · bison composite pick (round 9) · front half of heavy S2 (three-tip cowl, head) + rear half of moderate S1 (hind legs rising up into the body, belly tuck/push-up before the hind leg). Stout, belly hangs low in front.
 - 2026-11-05 · bison handoff (direction) · "literally the parts": one fore leg and one hind leg form (upper/lower/hoof), duplicated in the rig for near and far. No near/far art.
 - 2026-11-06 · Blender handoff (direction, applies to all 2D rig art) · imports as Grease Pencil; Michael sets line thickness. Deliver centerline stroke paths only, fill none, pivot at SVG 0,0, one file per part.
+- 2026-11-19 · URITP musician performer (direction locked) · style E "Brancusi": one turned ovoid per bone, no hand/foot/face detail. "oh i see the generic yet convincing shapes that were put together to make that persona." Read test: "kinda like a scarecrow or a tin man."
+- 2026-11-20 · performer v4.1 + set v5.0 · "much much better." Blunt turned-object caps, rounder head, mitt hands; props in the same form language with waisted string outlines and role-based greys.
+- 2026-11-21 · performer v4.3 (direction) · smooth lofted surfaces, fewer visible vertex lines, "not necessarily spherical."
 
 ## Ledger B Rejections
 
@@ -33,6 +36,9 @@ Add durable refusal + reason.
 - 2026-11-05 · bison v7 · head "still not sold." Specifics pending; Vera's read: tall round helmet, chin point edging toward goatee.
 - 2026-11-05 · bison v7 Blender import · "went poorly" (details not given). Stroke + CSS SVGs are not a Blender handoff.
 - 2026-11-06 · parts kit v1 · "i don't want the black fill in all of them ... you should give me paths, not real line." Rule: no occlusion fills by default; never outline strokes into filled shapes for rig art.
+- 2026-11-19 · performer v3.0 · "does not look very thoughtfully built anymore." Uniform tubes, box torso, egg head. v3.2 anatomy pass: "still not sold ... trying too hard maybe?" Rule: commit to a stylization system, never add anatomy detail.
+- 2026-11-20 · performer v4.1 feet · "i dont like their feet." Real bugs: feet rolled onto their edges (frame took 'up' from FRONT on toed-out feet) and the heel never reached the floor, leaving an ankle peg. Rule: feet take 'up' from the floor at rest; sole flat at z=0 under the heel.
+- 2026-11-21 · v4.3 preview · "Made it worse!" He was judging Vera's flat-per-triangle preview, not Blender. Rule: preview with a renderer that can show the property being asked about (true smooth shading for a smoothness fix), or say it can't.
 
 ## Ledger C Delivered assets
 
@@ -48,6 +54,7 @@ Pointers only: date · asset · format · URL · project. All on ClickUp task MA
 - 2026-11-05 · bison-v7 / v7.1 + pivots + near-foreleg test file + code-rigged walk test MP4 · SVG + PNG + MP4 · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (head not sold, Blender import poor)
 - 2026-11-05 · bison parts kit v1 (filled outline shapes) · ZIP of SVGs · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (rejected: fills, outlined line)
 - 2026-11-06 · bison Grease Pencil kit v2 (centerline paths, no fill) · ZIP of SVGs · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (verdict pending)
+- 2026-11-21 · URITP musician set: performer v4.3 + props v5.0 · code-built GLB + Blender scripts · repo `blender/musicians/` (source of truth) · URITP previz (performer approved direction; props smooth pass pending)
 
 ## Ledger D Measured tooling
 
@@ -55,6 +62,7 @@ Remeasured 2026-11-05; remeasure before relying.
 
 - Present: `cairosvg`, `shapely`, `numpy`, `PIL`, `matplotlib` mplot3d, `ffmpeg`. SVG to PNG proven; frame-by-frame SVG rig render to MP4 proven 2026-11-05.
 - Absent: binaries `blender`, `inkscape`, `rsvg-convert` (rechecked 2026-11-05). Blender import tests run on Michael's machine, not in sandbox. 2026-10-08 absent list (`trimesh`, `pygltflib`, `numpy-stl`, `open3d`, `pyvista`, `cadquery`, `solidpython`, `manifold3d`, `svgwrite`, `svgpathtools`, `scikit-image`, `openscad`) not rechecked.
+- 2026-11-21 · matplotlib mplot3d shades per face only: it cannot show smooth shading and misleads on any smoothness question. A numpy z-buffer renderer with interpolated normals (`source/render_smooth.py`) can. scipy ConvexHull + PCHIP and a hand-written GLB writer proven.
 
 ## Ledger E inherited/unverified
 
