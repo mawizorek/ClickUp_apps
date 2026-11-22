@@ -18,7 +18,7 @@ Shape governed by `_shared/designer-base.md` §2. Five entry kinds and nothing e
 
 ## 2 · What it actually cost
 
-**EMPTY.** Genuinely empty at birth, 2026-11-17.
+- **SMITH · SFANW · 2026-11-21 · PLANNED, pre-plot (real cost owed at strike).** DECIDED, Michael: SPAC inventory is used in full first, and URITP stock only fills the gap, "so I carry less over from the other building." COST: 12 F/L plus 32 side (X/L) on 26° needs 44 barrels against 29 SPAC-owned, so 15 are carried from URITP, which holds 44. Bodies were not the constraint: Lustr II is at 58 of 72. TAUGHT: the system counts were set before the plot was drawn, and the binding limit was the lens pool, not the fixture count. Check barrels before bodies next time. Source: Fixture Inventory and Channels (Patch) relationship counts, plus read: SFANW_LX2_2026-11-16.pdf (rev A) — export, not source file.
 
 🎯 One of the two entry kinds the retirement condition is keyed on (`decision-log.md` D1).
 
