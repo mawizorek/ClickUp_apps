@@ -6,13 +6,17 @@ kind: deterministic
 trigger: About to create ANY custom field (create_custom_field). Fires zero-discretion.
 nicknames: [Field Gate, CF Gate]
 safety_nets_for: [create_custom_field]
-version: 1
+version: 2
 added: 2026-07-07
 ---
 
 # Custom Field Gate (🔄 Hook)
 
 **Fires before ANY `create_custom_field` call. No naming, no discretion.** This is the pre-flight every custom field passes through before it can exist.
+
+## Rule 0 — FMP first (2026-11-22)
+
+Before anything below, run `gates/fmp-first-gate.md`. Relationship, roll-up, count and catalog fields are the classic sign that ClickUp is being bootstrapped into a database. If a global FMP schema covers the data, say so and recommend building there before this field exists.
 
 ## Why this gate exists (Brain's notes, not Michael's)
 
