@@ -1,4 +1,4 @@
-# MAW Previz v0.6.0 · Scene Zed · 2026-11-21
+# MAW Previz v0.6.1 · Scene Zed · 2026-11-21
 # The previz file syncs its rig from ONE place: the .mvr beside this .blend with the same name
 #   SPAC_CHANNEL_CHECK.blend  <->  SPAC_CHANNEL_CHECK.mvr
 # Vectorworks owns fixtures (type, position, patch). Blender owns cameras, world, render, animation.
@@ -17,7 +17,7 @@ import bpy, json, math, re, os, sys, glob, inspect, shutil, time, zipfile, hashl
 import xml.etree.ElementTree as ET
 from mathutils import Vector
 
-VERSION = "0.6.0"
+VERSION = "0.6.1"
 UNIVERSES = 64
 HAZE = 0.02
 AMBIENT = 0.05           # house ambient, 0-1 (5% = a theatre at blackout: exits, spill, aisle lights)
@@ -589,11 +589,13 @@ def rw_camera(rc):
         v = _field(f, *names)
         return _length_m(v) if v is not None else None
     raw = str(rc.get("name") or _field(f, "Name") or "").strip()
+    layer = str(rc.get("layer", "")).upper()
+    if not layer.startswith("CAM "):                 # presentation cameras elsewhere in the drawing stay out
+        return None, f"ignored camera {raw or '(unnamed)'}: on layer '{rc.get('layer', '')}', not a CAM layer"
     if not raw:
-        return None, "unnamed Renderworks camera skipped (name it in Object Info)"
+        return None, f"unnamed camera on {rc.get('layer', '')} skipped (name it in Object Info)"
     nm = " ".join(raw.upper().split())
     nm = nm if nm.startswith("CAM ") else "CAM " + nm
-    layer = str(rc.get("layer", "")).upper()
     tier = next((t for t in CAM_TIERS if t in layer), "VENUE")
     x, y, z = (float(c) for c in rc.get("xyz_m", (0, 0, 0)))
     h = length("Camera Height", "Height") or 0.0
@@ -623,6 +625,8 @@ def parse_cameras(data):
         layer = str(p.get("layer", "")).upper()
         tier = next((t for t in CAM_TIERS if t in layer), "VENUE")
         xyz = tuple(float(c) for c in p.get("xyz_m", (0, 0, 0)))
+        if nm.startswith(("CAM ", "AIM ")) and not layer.startswith("CAM "):
+            problems.append(f"ignored locus {nm}: on layer '{p.get('layer', '')}', not a CAM layer"); continue
         if nm.startswith("CAM "):
             m = re.match(r"^CAM (.+?)(?: (\d{2,3}))?$", nm)
             key, lens = m.group(1), float(m.group(2)) if m.group(2) else 35.0
@@ -692,6 +696,21 @@ def cameras():
                     t.objects.unlink(o); old_col.objects.link(o); parked += 1
         if parked:
             problems.append(f"{parked} guessed cameras moved to CAM OLD GUESSES (hidden)")
+        gone = 0
+        for t in tiers.values():                     # deleted or renamed in Vectorworks: park it, say so
+            for o in list(t.objects):
+                if o.type == "CAMERA" and o.get("maw_owner") == "VWX" and o.name not in names:
+                    t.objects.unlink(o); old_col.objects.link(o); gone += 1
+                    problems.append(f"{o.name} is no longer in Vectorworks: parked in CAM OLD GUESSES")
+        venue = [o for o in sc.objects if o.type == "MESH" and o.users_collection
+                 and any(c.name.startswith("VENUE") for c in o.users_collection)]
+        vb = _bbox(venue) if venue else None
+        for c in cams:                               # one line per camera, and a tell for a wrong origin/elevation
+            e = c["eye"]
+            line = f"{c['name']} [{c['tier']}] eye {e[0]:.1f}, {e[1]:.1f}, {e[2]:.2f} m · {c['lens']:.0f} mm"
+            if vb and not all(vb[0][i] - 2.0 <= e[i] <= vb[1][i] + 2.0 for i in range(3)):
+                line += " · OUTSIDE the venue: check user origin = CL x PL and CAM layer elevation 0"
+            problems.append(line)
         if note:
             problems.insert(0, note)
         if cams:
