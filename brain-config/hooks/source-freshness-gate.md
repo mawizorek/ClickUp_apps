@@ -6,9 +6,9 @@
 
 **Mode:** Always-on (deterministic). Fires for EVERY agent, not just Scout Sage. That is the whole point: the failure that created this hook happened while Brain was NOT wearing Sage. Procedure lives in tools, never in a persona (Constitution §2–§3). Sage STEWARDS this file; she does not store it.
 
-**Invocation:** Automatic (fires on volatile-fact output). Explicit forms: `/source-check` · `/freshness-check` · "how fresh is that" · "where did you get that" · "verify that source."
+**Invocation:** Automatic (fires on volatile-fact output). Explicit forms: `/source-check` · `/freshness-check` · "how fresh is that" · "where did you get that" · "verify that source" · "is it still up" · "is that posting still live."
 
-**Trigger:** Whenever a response will state a volatile fact: hours, open/closed, seasonal schedules, event dates, deadlines, prices, fees, admission, ticketing, addresses, locations, availability, stock, staffing, contact details, any "is X still true" about the outside world. Does NOT fire on: stable facts (history, definitions, settled math), or internal workspace lookups where the workspace IS the source of truth.
+**Trigger:** Whenever a response will state a volatile fact: hours, open/closed, seasonal schedules, event dates, deadlines, prices, fees, admission, ticketing, addresses, locations, availability, stock, staffing, contact details, **job-posting liveness (open / closed / accepting)**, any "is X still true" about the outside world. Also fires whenever an agent is about to WRITE a liveness stamp (e.g. a census `Last Verified` date). Does NOT fire on: stable facts (history, definitions, settled math), or internal workspace lookups where the workspace IS the source of truth.
 
 **Front door: this file, and nothing else.** No ClickUp Skill. Tools live in git only (LOCKED 2026-07-25).
 
@@ -20,7 +20,7 @@
 
 | Surface | Location |
 | --- | --- |
-| **Scope** | Any response containing a volatile external fact |
+| **Scope** | Any response containing a volatile external fact, and any write of a liveness stamp |
 | **Source-reliability ledger** | `super-agents/scout-sage/memory.md` |
 | **Lane seams** | Doc-Rot Sweep (docs vs HEAD), Recon Renata (repo vs standard) |
 
@@ -39,6 +39,20 @@ Brain told Michael that **Soleil** (550 Congress St, Portland — the OG Inciard
 | **Google Business Profile (Mon closed, Tue–Sat 11–6)** | **Owner-supplied and stamped *"updated by this business 1 week ago."*** |
 
 Brain ranked **first-party over dated.** The correct rule is the reverse. Soleil expanded its days sometime after 2024 and every undated aggregator is still echoing the old schedule at each other. Soleil's own website has **no hours page at all**, which is exactly why the stale copy propagated.
+
+## The second failure (2026-11-22) — the stale fetch
+
+Michael asked whether the **Fever Candlelight Event Manager (Rochester)** posting was still up. Brain fetched the employer careers page and then the Greenhouse page; both returned the full job body. Brain said **"still live"** twice, built a census row on it, and stamped `Last Verified`.
+
+**Michael's phone said "The job you are looking for is no longer open." Michael was right.**
+
+| What Brain trusted | Why it lost |
+|---|---|
+| `fetch_website` on careers.feverup.com | Returned a **cached snapshot** from before the close. Tier 1 source, stale transport. |
+| `fetch_website` on the Greenhouse job page | Same failure. A second fetch through the same pipe is the **same evidence twice**, not corroboration (Rule 3 applied to transport). |
+| **Greenhouse job-board API** (`boards-api.greenhouse.io/v1/boards/feverup/jobs/<id>`) | Returned **HTTP 404**. The live answer, uncacheable in practice. Checked only after Michael's screenshot. |
+
+The source ranking was fine: the posting page IS tier 1. The failure was **transport**. The page reader can hand back a stored copy with no age on it, so a first-party page arrived as an undated snapshot (Rule 2) and was read as live. The same pipe had stamped `Last Verified` on 65 census rows that night. A strict recheck confirmed only 24 of them. 8 were closed, 40 were unprovable.
 
 ---
 
@@ -96,13 +110,42 @@ Do not silently pick a winner.
 - The tiebreaker is almost always a date stamp. If Michael can see the stamp, he can overrule you.
 - **If a user contradicts you with a screenshot, they are probably holding a fresher source than yours.** Re-verify from scratch before defending the original answer. Do not argue from the stale source you already committed to.
 
+### Rule 7 — A fetch is not a live read
+
+The page reader can return a cached copy with no age on it. Treat every plain page fetch as an **undated snapshot** (tier 4 under Rule 2) until proven otherwise, even when the page itself is tier 1.
+
+**To call anything OPEN / LIVE / STILL TRUE, you need one of these, in order of preference:**
+
+1. **The system's data feed** (structured API that answers live or 404s). Known feeds:
+   - Greenhouse: `https://boards-api.greenhouse.io/v1/boards/<board>/jobs/<id>`. Job JSON = open, 404 = closed.
+   - Lever: `https://api.lever.co/v0/postings/<company>/<id>`.
+   - Ashby: `https://api.ashbyhq.com/posting-api/job-board/<company>`.
+   - Workable: `https://apply.workable.com/api/v1/widget/accounts/<account>`.
+   - Add new feeds to this list as they are proven.
+2. **A cache-busted fetch** (unique query param such as `?cb=<YYYYMMDD><letter>`, or `&cb=` when a query string already exists) that shows the active body **AND** a live action route (apply button or form, an application email, a ticket buy link). Body text alone is not enough.
+3. **Michael's own browser** (a screenshot or his say-so). This outranks every fetch.
+
+**Verdicts are three, never two:**
+
+- **OPEN / CONFIRMED** — feed returns it, or a cache-busted fetch shows the body plus an action route.
+- **CLOSED** — 404, an expired or closed banner, "no longer open / accepting / available," or a close date already passed.
+- **UNCONFIRMED** — anything else: conflicting signals, a fetch error (500, 504, 403), a body with no action route, or a plain uncache-busted fetch. Say it out loud.
+
+**Hard rules:**
+
+- **Two fetches through the same pipe are one source.** Re-fetching the same page, or a mirror of it, is not corroboration.
+- **Never write a liveness stamp** (census `Last Verified`, "checked live" notes, "still up" claims) from a plain fetch. Only a Rule 7 OPEN verdict earns a stamp. UNCONFIRMED rows stay unstamped.
+- **A sweep that stamps many rows uses the strict method on every row.** No sampling, no carrying over an earlier pass's stamp.
+- **When Michael's browser disagrees with a fetch, Michael wins immediately.** Fix the record first, then confirm with a feed if you can (Rule 6, screenshot clause).
+- When you report liveness, name the method: "confirmed via the Greenhouse feed" or "page loads but unconfirmed." The method IS the date stamp for a fetch.
+
 ---
 
 ## Corollary — where the FACT goes afterward
 
 A verified volatile fact belongs **on the work item** (the task, the itinerary, the reference doc) where Michael can read it — never only in an agent's memory. An agent privately remembering shop hours is a second, unauditable copy of something that already has a home.
 
-**What an agent SHOULD carry forward is source RELIABILITY, not the fact itself:** *"Inciardi's IG machine listings go stale — verify against the host business."* That is method memory, and it lives in `super-agents/scout-sage/memory.md`.
+**What an agent SHOULD carry forward is source RELIABILITY, not the fact itself:** *"Inciardi's IG machine listings go stale — verify against the host business."* That is method memory, and it lives in `super-agents/scout-sage/memory.md`. Transport reliability counts too: *"fetch_website can serve cached job pages; use the ATS feed."*
 
 ---
 
@@ -114,6 +157,7 @@ A verified volatile fact belongs **on the work item** (the task, the itinerary, 
 - Count ORIGINS, not rows. Agreeing aggregators are one source.
 - On conflict: show both, show dates, show the tiebreaker. Never silently pick.
 - If Michael contradicts with a screenshot: he is probably fresher. Re-verify from scratch.
+- **A fetch is not a live read.** Feed, or cache-busted body plus action route, or Michael's browser. Otherwise UNCONFIRMED, and no liveness stamp.
 
 ---
 
@@ -122,12 +166,13 @@ A verified volatile fact belongs **on the work item** (the task, the itinerary, 
 - `hooks/doc-rot-sweep.md` — different lane (docs vs HEAD freshness; this is WORLD vs claim freshness)
 - `agents/recon-renata.md` — different lane (repo shape vs standard)
 - `hooks/silent-fallback-law.md` — a source swap that doesn't announce itself is a lie
-- Routine Ricky's refresh runs fire this gate the moment a poll actually FETCHES
+- `hooks/data-refresh.md` — Routine Ricky's refresh runs fire this gate the moment a poll actually FETCHES; Rule 7 governs every `SAME` / `GONE` verdict and every census `Last Verified` stamp
 - Scout Sage's `memory.md` — accumulated source-reliability precedent
 
 ---
 
 ## Changelog
 
+- **v3 (2026-11-22)** — Added Rule 7 (a fetch is not a live read), the second founding failure, and a matching guardrail. Trigger widened to cover job-posting liveness and the writing of liveness stamps. Born from the Fever Candlelight error: a cached careers page and Greenhouse page read as live, while the Greenhouse API returned 404. The strict recheck that followed confirmed 24 of 72 census rows open, found 8 closed and 40 unconfirmed.
 - **v2 (2026-08-02)** — Header normalized to hook template standard (Audit Anna fix-spec, wave 1). Restructured: title fixed, blockquote converted to proper header fields, Steward moved to header position, added Front door, Established, Coordinates, Guardrails, Composes with sections.
 - **v1 (2026-07-25)** — Created. Born from the Soleil hours error on the Inciardi Maine machine run, where a two-year-old first-party Instagram post outranked an owner-updated Google profile stamped one week old. Authored alongside Scout Sage's graduation to git-teammate (Fleet Build Queue Decision Log Q8 → option B).
