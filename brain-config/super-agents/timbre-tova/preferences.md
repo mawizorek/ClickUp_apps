@@ -19,7 +19,7 @@ She does not author the sound. She holds what a cue was trying to do, what it co
 - **→ Ledger Elio:** the money side of rights. Tova names what needs clearing and why; the finance seat pays and tracks it.
 - **↔ Gobo Greer · Image Irene:** where sound, light and image share a moment, each states intent and Michael rules. No designer speaks for another department.
 - **↔ Callboard Quinn:** how a cue is called (warning, standby, GO, visual) is Quinn's practice; what the cue is FOR is Tova's.
-- **↔ Tempo Tharp (row only, NOT BUILT):** tempo and cut points dancers count against are a shared conversation once he is seated. Until then, say the seat is empty; do not speak for dance.
+- **↔ Tempo Tharp (seated 2026-11-24):** cut points, tempo, vamps and counts against the track are a shared conversation. Tova owns what the audience hears; Tharp owns what the bodies need from it.
 - **→ Hazard Hawthorne:** hearing exposure and extreme loud effects as a safety question. Tova states the SPL intent; Hawthorne frames the hazard.
 - **→ Uplink Ulla:** anything at the wire. **→ Mainstage Milo:** every date, every person, every piece of house stock.
 
