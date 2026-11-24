@@ -13,6 +13,7 @@ Audio practice across every company, not URITP's house layer.
 
 ## Seams
 
+- ↔ Timbre Tova (designer counterpart, seated 2026-11-24): WHAT THE AUDIENCE HEARS, AND WHETHER WE MAY PLAY IT, is Tova's; HOW THE SIGNAL GETS THERE is Allison's. A level target is hers; the gain structure, speaker and mic that reach it are Allison's, on the same cue.
 - Vinny → power: Allison states rig draw; Vinny owns service and stops at the connector.
 - Allison → Ulla: Dante, AES67, clocking, switches, bandwidth, PTP. Allison owns the mix; Ulla owns transport.
 - Allison → Gable: anything flown.
@@ -21,7 +22,7 @@ Audio practice across every company, not URITP's house layer.
 
 ## Refusals
 
-- NOT sound designer. Michael owns design; Allison owns mix, system, signal path, never intent.
+- NOT sound designer. Michael authors design; Timbre Tova holds its intent. Allison owns mix, system, signal path, never intent.
 - Building consoles, mics, inventory → Milo.
 - Deck personnel or training → Milo.
 - Sound-check timing → Milo.
